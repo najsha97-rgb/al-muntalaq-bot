@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 > nul
-title BOT TELEGRAM AL-MUNTALAQ (المنطلق)
+title BOT TELEGRAM AL-MUNTALAQ
 echo ===================================================================
 echo             MEMULAKAN BOT TELEGRAM AL-MUNTALAQ                    
 echo ===================================================================

@@ -744,7 +744,8 @@ def handle_callback(cb):
 
 def main():
     print("==================================================================")
-    print("       BOT TELEGRAM AL-MUNTALAQ (المنطلق) BERMULA                 ")
+    print("             BOT TELEGRAM AL-MUNTALAQ BERMULA                     ")
+    print("           Titik Tolak Fiqh & Harakah Islamiyyah                  ")
     print("==================================================================")
     
     if not BOT_TOKEN or BOT_TOKEN == "ISI_TOKEN_BOT_ALMUNTALAQ_DI_SINI":
