@@ -96,15 +96,34 @@ def send_api(method, payload):
         print(f"Ralat API Telegram ({method}): {e}")
         return None
 
+SUP_DIGITS = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+def clean_footnote_tags(text):
+    if not text:
+        return ""
+    # Tukar <sup class="fn-ref" data-fn-id="3" ...>[3]</sup> -> ⁽³⁾
+    text = re.sub(
+        r'<sup[^>]*data-fn-id=[\'"]?(\d+)[\'"]?[^>]*>.*?</sup>',
+        lambda m: f"⁽{m.group(1).translate(SUP_DIGITS)}⁾",
+        text,
+        flags=re.IGNORECASE
+    )
+    # Buang sebarang tag <sup> lain jika ada
+    text = re.sub(r'</?sup[^>]*>', '', text, flags=re.IGNORECASE)
+    return text
+
 def md_to_telegram_html(text):
     if not text:
         return ""
+    # Bersihkan tag HTML nota kaki terlebih dahulu sebelum escape entiti
+    text = clean_footnote_tags(text)
     text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text, flags=re.DOTALL)
     text = re.sub(r'(?<!\*)\*([^\*\n]+?)\*(?!\*)', r'<i>\1</i>', text)
     text = re.sub(r'(?<!_)_([^_\n]+?)_(?!_)', r'<i>\1</i>', text)
     text = re.sub(r'^[ \t]*[\*\-][ \t]+', '• ', text, flags=re.MULTILINE)
     return text
+
 
 def send_message(chat_id, text, reply_markup=None, parse_mode="HTML"):
     payload = {
@@ -365,7 +384,7 @@ def search_almuntalaq(keyword):
                 
             # Cari dalam perenggan
             for p in sec.get("paras", []):
-                ptext = p.get("text", "")
+                ptext = clean_footnote_tags(p.get("text", ""))
                 if kw in ptext.lower():
                     # Ambil snippet sekeliling perkataan
                     idx_kw = ptext.lower().find(kw)
@@ -382,7 +401,7 @@ def search_almuntalaq(keyword):
                     break # satu snippet per sub-tajuk sudah memadai
                     
         # Cari dalam ringkasan
-        raw_sum = ch.get("summary", "")
+        raw_sum = clean_footnote_tags(ch.get("summary", ""))
         if kw in raw_sum.lower():
             idx_kw = raw_sum.lower().find(kw)
             start = max(0, idx_kw - 40)
@@ -450,6 +469,34 @@ def handle_message(msg):
             f"Sila pilih menu di bawah untuk memulakan bacaan:"
         )
         send_message(chat_id, welcome_text, get_main_menu_keyboard())
+        return
+
+    # Carian / Semakan Nota Kaki Terus: /nota 3 atau /fn 3 atau /nota_3 atau /fn_3
+    m_fn = re.match(r"^/(?:nota|fn)[_\s]?(\d+)$", text, re.IGNORECASE)
+    if m_fn:
+        target_id = int(m_fn.group(1))
+        found_fn = None
+        found_ch = None
+        for ch in CHAPTERS:
+            for fn in ch.get("footnotes", []):
+                if fn.get("id") == target_id:
+                    found_fn = fn
+                    found_ch = ch
+                    break
+            if found_fn:
+                break
+        
+        if found_fn:
+            fn_reply = (
+                f"📝 <b>NOTA KAKI [{target_id}]</b>\n"
+                f"📚 <i>{found_ch['number']}: {found_ch['title']}</i>\n"
+                f"━━━━━━━━━━━━━━━━━━━\n\n"
+                f"{md_to_telegram_html(found_fn.get('text', ''))}"
+            )
+        else:
+            fn_reply = f"⚠️ Nota kaki nombor <b>[{target_id}]</b> tidak dijumpai dalam rekod."
+            
+        send_message(chat_id, fn_reply, {"inline_keyboard": [[{"text": "🏠 Utama", "callback_data": "menu_main"}]]})
         return
 
     if text.startswith("/cari"):
