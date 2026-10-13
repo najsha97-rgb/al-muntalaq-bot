@@ -5,7 +5,7 @@ echo ===================================================================
 echo             MEMULAKAN BOT TELEGRAM AL-MUNTALAQ                    
 echo ===================================================================
 echo.
-cd /d "c:\Users\pc\OneDrive\Documents\Bahan_Ilmiah_Dakwah\telegram_bot_almuntalaq"
+cd /d "%~dp0"
 "C:\Users\pc\AppData\Local\Python\pythoncore-3.14-64\python.exe" bot.py
 echo.
 pause
