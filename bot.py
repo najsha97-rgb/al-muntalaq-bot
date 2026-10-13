@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 BOT TELEGRAM AL-MUNTALAQ (المنطلق)
-Titik Tolak Dakwah, Tarbiah & Fiqh Harakah Islamiyyah
+Titik Tolak Dakwah, Tarbiyah & Fiqh Harakah Islamiyah
 Karya: As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)
 """
 
@@ -615,11 +615,9 @@ def handle_callback(cb):
         about_text = (
             f"ℹ️ <b>Mengenai Kitab Al-Muntalaq (المنطلق)</b>\n\n"
             f"<b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
-            f"<b>Genre:</b> Fiqh Dakwah, Tarbiah & Manhaj Harakah Islamiyyah\n"
+            f"<b>Genre:</b> Fiqh Dakwah, Tarbiyah & Manhaj Harakah Islamiyah\n"
             f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki\n\n"
-            f"Kitab <i>Al-Muntalaq</i> merupakan siri pertama dalam trilogi kebangkitan dakwah karya Al-Rasyid "
-            f"(diikuti oleh <i>Al-Awa'iq</i> dan <i>Al-Masar</i>). Ia membina titik tolak keimanan dan asas tajarrod "
-            f"(pengabdian total) yang memelihara para da'i daripada tergelincir mengikut hawa nafsu.\n\n"
+            f"Buku <i>al-Muntalaq</i> merupakan siri pertama dalam siri-siri fiqh dakwah dan harakah Islamiyah dimulai dengan <i>al-Muntalaq</i> (untuk mengenali tabiatnya), <i>al-‘Awa’iq</i> (yang dipenuhi dengan segala macam jenis halangan), <i>al-Raqa’iq</i> (yang boleh melembutkan hati anda dengan kelembutan makna-maknanya) dan <i>al-Bawariq</i> (yang mengandungi lintasan-lintasan yang boleh dijadikan panduan) dan seterusnya <i>al-Masar</i> (yang mengupas strategi, polisi, dan fiqh perancangan harakah Islamiyah).\n\n"
             f"🌐 Aplikasi Web PWA: https://al-muntalaq-dakwah.netlify.app/"
         )
         btns = {
@@ -745,7 +743,7 @@ def handle_callback(cb):
 def main():
     print("==================================================================")
     print("             BOT TELEGRAM AL-MUNTALAQ BERMULA                     ")
-    print("           Titik Tolak Fiqh & Harakah Islamiyyah                  ")
+    print("           Titik Tolak Fiqh & Harakah Islamiyah                  ")
     print("==================================================================")
     
     if not BOT_TOKEN or BOT_TOKEN == "ISI_TOKEN_BOT_ALMUNTALAQ_DI_SINI":
