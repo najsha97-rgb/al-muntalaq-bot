@@ -211,7 +211,7 @@ def get_main_menu_keyboard():
     return {
         "inline_keyboard": [
             [
-                {"text": "⚜️ Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
+                {"text": "🪙 Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
                 {"text": "⚡ Ringkasan Eksklusif", "callback_data": "menu_summaries"}
             ],
             [
@@ -238,7 +238,7 @@ def get_chapters_keyboard(mode="full"):
     for idx in range(1, len(CHAPTERS)):
         ch = CHAPTERS[idx]
         title_clean = ch['title'].replace("'", "")
-        title_short = f"⚜️ Bab {idx}: {title_clean}"
+        title_short = f"🪙 Bab {idx}: {title_clean}"
         if len(title_short) > 25:
             title_short = title_short[:23] + ".."
         row.append({"text": title_short, "callback_data": f"{prefix}{idx}"})
@@ -616,10 +616,10 @@ def handle_callback(cb):
     
     if data == "menu_main":
         welcome_text = (
-            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n"
             f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b> 🌿\n"
             f"<i>Titik Tolak Dakwah, Tarbiyah & Fiqh Harakah</i>\n"
-            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
             f"<blockquote>📖 <b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
             f"✨ <i>“Sentiasa memperbaharui iman, memurnikan niat, dan menyemarakkan himmah perjuangan.”</i></blockquote>\n\n"
             f"📚 <b>Struktur Ilmiah Kitab:</b>\n"
@@ -636,7 +636,7 @@ def handle_callback(cb):
         return
 
     if data == "menu_chapters":
-        txt = "📗 <b>SENARAI BAB KITAB AL-MUNTALAQ:</b>\nSila pilih bab untuk melihat sub-tajuk dan teks penuh:"
+        txt = "🪙 <b>SENARAI BAB KITAB AL-MUNTALAQ:</b>\nSila pilih bab untuk melihat sub-tajuk dan teks penuh:"
         edit_message(chat_id, msg_id, txt, get_chapters_keyboard(mode="full"))
         return
 
@@ -647,9 +647,9 @@ def handle_callback(cb):
 
     if data == "menu_search_info":
         txt = (
-            f"🔍 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🔍 ━━━━━━━━━━━━━━━━━━━ 🪙\n"
             f"🌿 <b>PANDUAN CARIAN PANTAS AL-MUNTALAQ</b>\n"
-            f"🔍 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"🔍 ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
             f"Anda boleh membuat carian pantas terus dalam ruangan sembang ini dengan menaip:\n\n"
             f"👉 <code>/cari hawa nafsu</code>\n"
             f"👉 <code>/cari gerhana</code>\n"
@@ -669,9 +669,9 @@ def handle_callback(cb):
 
     if data == "menu_about":
         about_text = (
-            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ 🪙\n"
             f"🌿 <b>MENGENAI KITAB AL-MUNTALAQ (المنطلق)</b> 🌿\n"
-            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
             f"<blockquote><b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
             f"<b>Genre:</b> Fiqh Dakwah, Tarbiyah & Manhaj Harakah Islamiyah\n"
             f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki</blockquote>\n\n"
