@@ -219,7 +219,7 @@ def get_main_menu_keyboard():
                 {"text": "💎 Mutiara Hikmah Dakwah", "callback_data": "hikmah_random"}
             ],
             [
-                {"text": "🌿 Buka Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}
+                {"text": "🌿 Buka Web PWA Al-Muntalaq 🌐", "url": "https://najsha97-rgb.github.io/al-muntalaq-pwa/"}
             ],
             [
                 {"text": "ℹ️ Info Kitab & Syeikh", "callback_data": "menu_about"}
@@ -447,7 +447,7 @@ def get_random_hikmah_message_and_keyboard():
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"📚 <b>Sumber:</b> {item.get('ch_num', '')} - {item.get('ch_title', '')}\n"
             f"🌿 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>\n"
-            f"🌐 https://al-muntalaq-dakwah.netlify.app/"
+            f"🌐 https://najsha97-rgb.github.io/al-muntalaq-pwa/"
         )
         ch_idx = item.get("ch_idx", 0)
         kb = {
@@ -484,7 +484,7 @@ def get_random_hikmah_message_and_keyboard():
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"📚 <i>Sumber: {num} - {title}</i>\n"
             f"🌿 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>\n"
-            f"🌐 https://al-muntalaq-dakwah.netlify.app/"
+            f"🌐 https://najsha97-rgb.github.io/al-muntalaq-pwa/"
         )
         kb = {
             "inline_keyboard": [
@@ -518,7 +518,7 @@ def handle_message(msg):
             f"• ⚡ <code>Ringkasan Eksklusif</code> & Dimensi Fiqh Haraki\n"
             f"• 💎 <code>Mutiara Hikmah</code> generasi salaf & pejuang dakwah\n\n"
             f"🌐 <b>Web PWA (Tema Zamrud & Emas):</b>\n"
-            f"https://al-muntalaq-dakwah.netlify.app/\n\n"
+            f"https://najsha97-rgb.github.io/al-muntalaq-pwa/\n\n"
             f"<i>Sila pilih menu di bawah untuk memulakan bacaan:</i>"
         )
         send_message(chat_id, welcome_text, get_main_menu_keyboard())
@@ -629,7 +629,7 @@ def handle_callback(cb):
             f"• ⚡ <code>Ringkasan Eksklusif</code> & Dimensi Fiqh Haraki\n"
             f"• 💎 <code>Mutiara Hikmah</code> tokoh dakwah & salaf\n\n"
             f"🌐 <b>Web PWA (Tema Zamrud & Emas):</b>\n"
-            f"https://al-muntalaq-dakwah.netlify.app/\n\n"
+            f"https://najsha97-rgb.github.io/al-muntalaq-pwa/\n\n"
             f"<i>Sila pilih menu di bawah untuk memulakan bacaan:</i>"
         )
         edit_message(chat_id, msg_id, welcome_text, get_main_menu_keyboard())
@@ -677,11 +677,11 @@ def handle_callback(cb):
             f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki</blockquote>\n\n"
             f"Buku <i>al-Muntalaq</i> merupakan siri pertama dalam siri-siri fiqh dakwah dan harakah Islamiyah dimulai dengan <i>al-Muntalaq</i> (mengenali tabiatnya), <i>al-‘Awa’iq</i> (halangan dakwah), <i>al-Raqa’iq</i> (kelembutan jiwa), <i>al-Bawariq</i> (lintasan panduan), dan seterusnya <i>al-Masar</i> (strategi, polisi, dan fiqh perancangan harakah).\n\n"
             f"🌐 <b>Aplikasi Web PWA (Tema Zamrud & Emas):</b>\n"
-            f"https://al-muntalaq-dakwah.netlify.app/"
+            f"https://najsha97-rgb.github.io/al-muntalaq-pwa/"
         )
         btns = {
             "inline_keyboard": [
-                [{"text": "🟢 Layari Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}],
+                [{"text": "🟢 Layari Web PWA Al-Muntalaq 🌐", "url": "https://najsha97-rgb.github.io/al-muntalaq-pwa/"}],
                 [{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]
             ]
         }
