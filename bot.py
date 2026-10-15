@@ -208,7 +208,7 @@ def get_main_menu_keyboard():
                 {"text": "💎 Mutiara Hikmah Dakwah", "callback_data": "hikmah_random"}
             ],
             [
-                {"text": "🌐 Buka Web PWA Al-Muntalaq", "url": "https://al-muntalaq-dakwah.netlify.app/"}
+                {"text": "🌐 Buka Web PWA Al-Muntalaq", "url": "https://al-muntalaq-dakwah.netlify.app/?v=2"}
             ],
             [
                 {"text": "ℹ️ Info Kitab & Syeikh", "callback_data": "menu_about"}
@@ -618,11 +618,11 @@ def handle_callback(cb):
             f"<b>Genre:</b> Fiqh Dakwah, Tarbiyah & Manhaj Harakah Islamiyah\n"
             f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki\n\n"
             f"Buku <i>al-Muntalaq</i> merupakan siri pertama dalam siri-siri fiqh dakwah dan harakah Islamiyah dimulai dengan <i>al-Muntalaq</i> (untuk mengenali tabiatnya), <i>al-‘Awa’iq</i> (yang dipenuhi dengan segala macam jenis halangan), <i>al-Raqa’iq</i> (yang boleh melembutkan hati anda dengan kelembutan makna-maknanya) dan <i>al-Bawariq</i> (yang mengandungi lintasan-lintasan yang boleh dijadikan panduan) dan seterusnya <i>al-Masar</i> (yang mengupas strategi, polisi, dan fiqh perancangan harakah Islamiyah).\n\n"
-            f"🌐 Aplikasi Web PWA: https://al-muntalaq-dakwah.netlify.app/"
+            f"🌐 Aplikasi Web PWA: https://al-muntalaq-dakwah.netlify.app/?v=2"
         )
         btns = {
             "inline_keyboard": [
-                [{"text": "🌐 Layari Web PWA", "url": "https://al-muntalaq-dakwah.netlify.app/"}],
+                [{"text": "🌐 Layari Web PWA", "url": "https://al-muntalaq-dakwah.netlify.app/?v=2"}],
                 [{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]
             ]
         }
