@@ -211,7 +211,7 @@ def get_main_menu_keyboard():
     return {
         "inline_keyboard": [
             [
-                {"text": "📗 Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
+                {"text": "⚜️ Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
                 {"text": "⚡ Ringkasan Eksklusif", "callback_data": "menu_summaries"}
             ],
             [
@@ -219,7 +219,7 @@ def get_main_menu_keyboard():
                 {"text": "💎 Mutiara Hikmah Dakwah", "callback_data": "hikmah_random"}
             ],
             [
-                {"text": "🟢 Buka Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}
+                {"text": "🌿 Buka Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}
             ],
             [
                 {"text": "ℹ️ Info Kitab & Syeikh", "callback_data": "menu_about"}
@@ -238,7 +238,7 @@ def get_chapters_keyboard(mode="full"):
     for idx in range(1, len(CHAPTERS)):
         ch = CHAPTERS[idx]
         title_clean = ch['title'].replace("'", "")
-        title_short = f"🟢 Bab {idx}: {title_clean}"
+        title_short = f"⚜️ Bab {idx}: {title_clean}"
         if len(title_short) > 25:
             title_short = title_short[:23] + ".."
         row.append({"text": title_short, "callback_data": f"{prefix}{idx}"})
