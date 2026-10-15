@@ -67,6 +67,17 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 CHAPTERS = ALMUNTALAQ_DATA.get("chapters", [])
 print(f"Berjaya memuatkan {len(CHAPTERS)} bab Al-Muntalaq.")
 
+# Muat Mutiara Hikmah Al-Muntalaq
+QUOTES_PATH = os.path.join(BASE_DIR, "almuntalaq_quotes.json")
+HIKMAH_DATA = []
+if os.path.exists(QUOTES_PATH):
+    try:
+        with open(QUOTES_PATH, "r", encoding="utf-8") as f:
+            HIKMAH_DATA = json.load(f)
+        print(f"Berjaya memuatkan {len(HIKMAH_DATA)} mutiara hikmah Al-Muntalaq.")
+    except Exception as e:
+        print(f"Ralat membaca almuntalaq_quotes.json: {e}")
+
 # Sesi HTTP
 session = requests.Session()
 API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
@@ -200,7 +211,7 @@ def get_main_menu_keyboard():
     return {
         "inline_keyboard": [
             [
-                {"text": "📖 Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
+                {"text": "📗 Senarai Bab (18 Bab)", "callback_data": "menu_chapters"},
                 {"text": "⚡ Ringkasan Eksklusif", "callback_data": "menu_summaries"}
             ],
             [
@@ -208,7 +219,7 @@ def get_main_menu_keyboard():
                 {"text": "💎 Mutiara Hikmah Dakwah", "callback_data": "hikmah_random"}
             ],
             [
-                {"text": "🌐 Buka Web PWA Al-Muntalaq", "url": "https://al-muntalaq-dakwah.netlify.app/?v=2"}
+                {"text": "🟢 Buka Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}
             ],
             [
                 {"text": "ℹ️ Info Kitab & Syeikh", "callback_data": "menu_about"}
@@ -227,9 +238,9 @@ def get_chapters_keyboard(mode="full"):
     for idx in range(1, len(CHAPTERS)):
         ch = CHAPTERS[idx]
         title_clean = ch['title'].replace("'", "")
-        title_short = f"Bab {idx}: {title_clean}"
-        if len(title_short) > 23:
-            title_short = title_short[:21] + ".."
+        title_short = f"🟢 Bab {idx}: {title_clean}"
+        if len(title_short) > 25:
+            title_short = title_short[:23] + ".."
         row.append({"text": title_short, "callback_data": f"{prefix}{idx}"})
         if len(row) == 2:
             buttons.append(row)
@@ -249,7 +260,7 @@ def get_subtopics_keyboard(ch_idx):
     buttons.append([{"text": "⚡ Baca Ringkasan Padat Bab Ini", "callback_data": f"sumch_{ch_idx}"}])
     
     for s_idx, sec in enumerate(sections):
-        title_btn = f"{s_idx+1}. {sec['title']}"
+        title_btn = f"🌿 {s_idx+1}. {sec['title']}"
         if len(title_btn) > 36:
             title_btn = title_btn[:34] + ".."
         buttons.append([{"text": title_btn, "callback_data": f"sub_{ch_idx}_{s_idx}_0"}])
@@ -268,10 +279,11 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
     sec = sections[s_idx]
     
     header = (
-        f"🏛 <b>AL-MUNTALAQ (المنطلق)</b>\n"
+        f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+        f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b>\n"
         f"📚 <b>{ch['number']}: {ch['title']}</b>\n"
         f"📑 <b>Sub-Tajuk: {sec['title']}</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
     )
     
     paras = sec.get("paras", [])
@@ -285,9 +297,9 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
         ptext = md_to_telegram_html(p.get("text", ""))
         if ptype == "quran":
             src = f" <i>({md_to_telegram_html(p.get('source',''))})</i>" if p.get('source') else ""
-            rendered_paras.append(f"📖 <b>[Ayat Al-Quran]</b>\n<i>« {ptext} »</i>{src}")
+            rendered_paras.append(f"<blockquote>📖 <b>[Ayat Al-Quran]</b>\n<i>« {ptext} »</i>{src}</blockquote>")
         elif ptype == "quote":
-            rendered_paras.append(f"❝ <i>{ptext}</i> ❞")
+            rendered_paras.append(f"<blockquote>❝ <i>{ptext}</i> ❞</blockquote>")
         else:
             rendered_paras.append(ptext)
             
@@ -311,7 +323,7 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
     page = max(0, min(page, total_pages - 1))
     body = pages_content[page] if pages_content else "<i>Tiada teks.</i>"
     
-    page_footer = f"\n\n───────────────\n📄 <i>Halaman {page+1} daripada {total_pages}</i>"
+    page_footer = f"\n\n🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n📄 <i>Halaman {page+1} daripada {total_pages}</i>"
     return header + body + page_footer, total_pages
 
 def format_summary_text(ch_idx, page=0):
@@ -319,9 +331,10 @@ def format_summary_text(ch_idx, page=0):
     raw_sum = ch.get("summary", "")
     
     header = (
-        f"⚡ <b>RINGKASAN EKSLUSIF & ANALISIS TARBAWI</b>\n"
+        f"⚡ ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+        f"💎 <b>RINGKASAN EKSLUSIF & ANALISIS TARBAWI</b>\n"
         f"📚 <b>{ch['number']}: {ch['title']}</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━\n\n"
+        f"⚡ ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
     )
     
     if not raw_sum:
@@ -421,31 +434,65 @@ def search_almuntalaq(keyword):
 
 # ================= HIKMAH RAWAK =================
 
-def get_random_hikmah():
-    quotes = []
-    for ch in CHAPTERS:
-        s = ch.get("summary", "")
-        if "💎 Mutiara" in s:
-            parts = s.split("💎 Mutiara")
-            if len(parts) > 1:
-                sub = parts[1].split("⚔️ Tambahan")[0]
-                lines = [l.strip() for l in sub.split("\n") if l.strip().startswith("•")]
-                for l in lines:
-                    quotes.append((ch['number'], ch['title'], l))
-                    
-    if not quotes:
-        return "<i>Mutiara hikmah sedang dikemaskini.</i>"
+def get_random_hikmah_message_and_keyboard():
+    if HIKMAH_DATA:
+        item = random.choice(HIKMAH_DATA)
+        quote_text = md_to_telegram_html(item.get("quote", ""))
+        text = (
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"💎 <b>MUTIARA HIKMAH DAKWAH</b> ⚜️\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"👤 <b>{item.get('speaker', 'Tokoh Dakwah')}</b>\n\n"
+            f"<blockquote><i>{quote_text}</i></blockquote>\n\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+            f"📚 <b>Sumber:</b> {item.get('ch_num', '')} - {item.get('ch_title', '')}\n"
+            f"🌿 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>\n"
+            f"🌐 https://al-muntalaq-dakwah.netlify.app/"
+        )
+        ch_idx = item.get("ch_idx", 0)
+        kb = {
+            "inline_keyboard": [
+                [{"text": f"📖 Baca: {item.get('ch_num', 'Bab Ini')}", "callback_data": f"ch_{ch_idx}"}],
+                [{"text": "🎲 Mutiara Lain (Rawak)", "callback_data": "hikmah_random"}],
+                [{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]
+            ]
+        }
+        return text, kb
+    else:
+        quotes = []
+        for ch in CHAPTERS:
+            s = ch.get("summary", "")
+            if "💎 Mutiara" in s:
+                parts = s.split("💎 Mutiara")
+                if len(parts) > 1:
+                    sub = parts[1].split("⚔️ Tambahan")[0]
+                    lines = [l.strip() for l in sub.split("\n") if l.strip().startswith("•")]
+                    for l in lines:
+                        quotes.append((ch['number'], ch['title'], l))
+                        
+        if not quotes:
+            return "<i>Mutiara hikmah sedang dikemaskini.</i>", {"inline_keyboard": [[{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]]}
+            
+        num, title, quote = random.choice(quotes)
+        quote_clean = md_to_telegram_html(quote)
         
-    num, title, quote = random.choice(quotes)
-    quote_clean = md_to_telegram_html(quote)
-    
-    return (
-        f"💎 <b>MUTIARA HIKMAH DAKWAH</b>\n"
-        f"📚 <i>Sumber: {num} - {title}</i>\n"
-        f"━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{quote_clean}\n\n"
-        f"🌟 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>"
-    )
+        text = (
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"💎 <b>MUTIARA HIKMAH DAKWAH</b> ⚜️\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"<blockquote>{quote_clean}</blockquote>\n\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+            f"📚 <i>Sumber: {num} - {title}</i>\n"
+            f"🌿 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>\n"
+            f"🌐 https://al-muntalaq-dakwah.netlify.app/"
+        )
+        kb = {
+            "inline_keyboard": [
+                [{"text": "🎲 Mutiara Lain (Rawak)", "callback_data": "hikmah_random"}],
+                [{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]
+            ]
+        }
+        return text, kb
 
 # ================= PENGENDALI MESEJ & CALLBACK =================
 
@@ -458,15 +505,21 @@ def handle_message(msg):
         
     if text.startswith("/start") or text.startswith("/menu"):
         welcome_text = (
-            f"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n\n"
-            f"Selamat datang ke <b>Bot Rasmi Al-Muntalaq (المنطلق)</b>!\n\n"
-            f"Kitab agung fiqh dakwah & tarbiah harakah oleh <b>As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)</b>.\n\n"
-            f"✨ <b>Ciri-Ciri Utama:</b>\n"
-            f"• <b>18 Bab Penuh</b> (Mukadimah + 17 Bab).\n"
-            f"• <b>92 Sub-Tajuk</b> berstruktur & 246 Nota Kaki.\n"
-            f"• <b>Ringkasan Eksklusif</b> berserta Nukilan Emas Salafussoleh & Dimensi Fiqh Haraki.\n"
-            f"• <b>Carian Pantas</b> ayat al-Quran, topik & dalil.\n\n"
-            f"Sila pilih menu di bawah untuk memulakan bacaan:"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b> 🌿\n"
+            f"<i>Titik Tolak Dakwah, Tarbiyah & Fiqh Harakah</i>\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"<blockquote>📖 <b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
+            f"✨ <i>“Sentiasa memperbaharui iman, memurnikan niat, dan menyemarakkan himmah perjuangan.”</i></blockquote>\n\n"
+            f"📚 <b>Struktur Ilmiah Kitab:</b>\n"
+            f"• 🟢 <code>18 Bab Penuh</code> (Mukadimah + 17 Bab Utama)\n"
+            f"• 🌿 <code>92 Sub-Tajuk</code> berstruktur rapi\n"
+            f"• 📝 <code>246 Nota Kaki</code> ilmiah\n"
+            f"• ⚡ <code>Ringkasan Eksklusif</code> & Dimensi Fiqh Haraki\n"
+            f"• 💎 <code>Mutiara Hikmah</code> generasi salaf & pejuang dakwah\n\n"
+            f"🌐 <b>Web PWA (Tema Zamrud & Emas):</b>\n"
+            f"https://al-muntalaq-dakwah.netlify.app/\n\n"
+            f"<i>Sila pilih menu di bawah untuk memulakan bacaan:</i>"
         )
         send_message(chat_id, welcome_text, get_main_menu_keyboard())
         return
@@ -488,9 +541,10 @@ def handle_message(msg):
         
         if found_fn:
             fn_reply = (
-                f"📝 <b>NOTA KAKI [{target_id}]</b>\n"
+                f"📝 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+                f"🌿 <b>NOTA KAKI [{target_id}]</b>\n"
                 f"📚 <i>{found_ch['number']}: {found_ch['title']}</i>\n"
-                f"━━━━━━━━━━━━━━━━━━━\n\n"
+                f"📝 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
                 f"{md_to_telegram_html(found_fn.get('text', ''))}"
             )
         else:
@@ -527,13 +581,7 @@ def handle_message(msg):
         return
 
     if text.startswith("/hikmah"):
-        h_text = get_random_hikmah()
-        btns = {
-            "inline_keyboard": [
-                [{"text": "🔄 Hikmah Lain", "callback_data": "hikmah_random"}],
-                [{"text": "🏠 Menu Utama", "callback_data": "menu_main"}]
-            ]
-        }
+        h_text, btns = get_random_hikmah_message_and_keyboard()
         send_message(chat_id, h_text, btns)
         return
 
@@ -568,26 +616,40 @@ def handle_callback(cb):
     
     if data == "menu_main":
         welcome_text = (
-            f"🏛 <b>Menu Utama: Al-Muntalaq (المنطلق)</b>\n\n"
-            f"Karya: <b>As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)</b>\n"
-            f"Sila pilih kategori bacaan:"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b> 🌿\n"
+            f"<i>Titik Tolak Dakwah, Tarbiyah & Fiqh Harakah</i>\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"<blockquote>📖 <b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
+            f"✨ <i>“Sentiasa memperbaharui iman, memurnikan niat, dan menyemarakkan himmah perjuangan.”</i></blockquote>\n\n"
+            f"📚 <b>Struktur Ilmiah Kitab:</b>\n"
+            f"• 🟢 <code>18 Bab Penuh</code> (Mukadimah + 17 Bab Utama)\n"
+            f"• 🌿 <code>92 Sub-Tajuk</code> berstruktur rapi\n"
+            f"• 📝 <code>246 Nota Kaki</code> ilmiah\n"
+            f"• ⚡ <code>Ringkasan Eksklusif</code> & Dimensi Fiqh Haraki\n"
+            f"• 💎 <code>Mutiara Hikmah</code> tokoh dakwah & salaf\n\n"
+            f"🌐 <b>Web PWA (Tema Zamrud & Emas):</b>\n"
+            f"https://al-muntalaq-dakwah.netlify.app/\n\n"
+            f"<i>Sila pilih menu di bawah untuk memulakan bacaan:</i>"
         )
         edit_message(chat_id, msg_id, welcome_text, get_main_menu_keyboard())
         return
 
     if data == "menu_chapters":
-        txt = "📖 <b>Senarai Bab Kitab Al-Muntalaq:</b>\nSila pilih bab untuk melihat sub-tajuk dan teks penuh:"
+        txt = "📗 <b>SENARAI BAB KITAB AL-MUNTALAQ:</b>\nSila pilih bab untuk melihat sub-tajuk dan teks penuh:"
         edit_message(chat_id, msg_id, txt, get_chapters_keyboard(mode="full"))
         return
 
     if data == "menu_summaries":
-        txt = "⚡ <b>Ringkasan Padat & Fiqh Haraki Al-Muntalaq:</b>\nPilih bab untuk membaca ringkasan berstruktur berserta nukilan emas salafussoleh:"
+        txt = "⚡ <b>RINGKASAN PADAT & FIQH HARAKI AL-MUNTALAQ:</b>\nPilih bab untuk membaca ringkasan berstruktur berserta nukilan emas salafussoleh:"
         edit_message(chat_id, msg_id, txt, get_chapters_keyboard(mode="summary"))
         return
 
     if data == "menu_search_info":
         txt = (
-            f"🔍 <b>Panduan Carian Topik & Dalil Al-Muntalaq</b>\n\n"
+            f"🔍 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🌿 <b>PANDUAN CARIAN PANTAS AL-MUNTALAQ</b>\n"
+            f"🔍 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
             f"Anda boleh membuat carian pantas terus dalam ruangan sembang ini dengan menaip:\n\n"
             f"👉 <code>/cari hawa nafsu</code>\n"
             f"👉 <code>/cari gerhana</code>\n"
@@ -601,28 +663,25 @@ def handle_callback(cb):
         return
 
     if data == "hikmah_random":
-        h_text = get_random_hikmah()
-        btns = {
-            "inline_keyboard": [
-                [{"text": "🔄 Hikmah Lain", "callback_data": "hikmah_random"}],
-                [{"text": "🏠 Menu Utama", "callback_data": "menu_main"}]
-            ]
-        }
+        h_text, btns = get_random_hikmah_message_and_keyboard()
         edit_message(chat_id, msg_id, h_text, btns)
         return
 
     if data == "menu_about":
         about_text = (
-            f"ℹ️ <b>Mengenai Kitab Al-Muntalaq (المنطلق)</b>\n\n"
-            f"<b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
+            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+            f"🌿 <b>MENGENAI KITAB AL-MUNTALAQ (المنطلق)</b> 🌿\n"
+            f"ℹ️ ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+            f"<blockquote><b>Pengarang:</b> As-Syeikh Muhammad Ahmad Ar-Rasyid (رحمه الله)\n"
             f"<b>Genre:</b> Fiqh Dakwah, Tarbiyah & Manhaj Harakah Islamiyah\n"
-            f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki\n\n"
-            f"Buku <i>al-Muntalaq</i> merupakan siri pertama dalam siri-siri fiqh dakwah dan harakah Islamiyah dimulai dengan <i>al-Muntalaq</i> (untuk mengenali tabiatnya), <i>al-‘Awa’iq</i> (yang dipenuhi dengan segala macam jenis halangan), <i>al-Raqa’iq</i> (yang boleh melembutkan hati anda dengan kelembutan makna-maknanya) dan <i>al-Bawariq</i> (yang mengandungi lintasan-lintasan yang boleh dijadikan panduan) dan seterusnya <i>al-Masar</i> (yang mengupas strategi, polisi, dan fiqh perancangan harakah Islamiyah).\n\n"
-            f"🌐 Aplikasi Web PWA: https://al-muntalaq-dakwah.netlify.app/?v=2"
+            f"<b>Struktur:</b> 18 Bab (Mukadimah + 17 Bab), 92 Sub-Tajuk, 246 Nota Kaki</blockquote>\n\n"
+            f"Buku <i>al-Muntalaq</i> merupakan siri pertama dalam siri-siri fiqh dakwah dan harakah Islamiyah dimulai dengan <i>al-Muntalaq</i> (mengenali tabiatnya), <i>al-‘Awa’iq</i> (halangan dakwah), <i>al-Raqa’iq</i> (kelembutan jiwa), <i>al-Bawariq</i> (lintasan panduan), dan seterusnya <i>al-Masar</i> (strategi, polisi, dan fiqh perancangan harakah).\n\n"
+            f"🌐 <b>Aplikasi Web PWA (Tema Zamrud & Emas):</b>\n"
+            f"https://al-muntalaq-dakwah.netlify.app/"
         )
         btns = {
             "inline_keyboard": [
-                [{"text": "🌐 Layari Web PWA", "url": "https://al-muntalaq-dakwah.netlify.app/?v=2"}],
+                [{"text": "🟢 Layari Web PWA Al-Muntalaq 🌐", "url": "https://al-muntalaq-dakwah.netlify.app/"}],
                 [{"text": "⬅️ Menu Utama", "callback_data": "menu_main"}]
             ]
         }
