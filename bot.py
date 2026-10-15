@@ -279,11 +279,11 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
     sec = sections[s_idx]
     
     header = (
-        f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
+        f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n"
         f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b>\n"
         f"📚 <b>{ch['number']}: {ch['title']}</b>\n"
         f"📑 <b>Sub-Tajuk: {sec['title']}</b>\n"
-        f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+        f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
     )
     
     paras = sec.get("paras", [])
@@ -323,7 +323,7 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
     page = max(0, min(page, total_pages - 1))
     body = pages_content[page] if pages_content else "<i>Tiada teks.</i>"
     
-    page_footer = f"\n\n🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n📄 <i>Halaman {page+1} daripada {total_pages}</i>"
+    page_footer = f"\n\n🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n📄 <i>Halaman {page+1} daripada {total_pages}</i>"
     return header + body + page_footer, total_pages
 
 def format_summary_text(ch_idx, page=0):
@@ -331,10 +331,10 @@ def format_summary_text(ch_idx, page=0):
     raw_sum = ch.get("summary", "")
     
     header = (
-        f"⚡ ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
-        f"💎 <b>RINGKASAN EKSLUSIF & ANALISIS TARBAWI</b>\n"
+        f"⚡ ━━━━━━━━━━━━━━━━━━━ 🪙\n"
+        f"💎 <b>RINGKASAN EKSKLUSIF & ANALISIS TARBAWI</b>\n"
         f"📚 <b>{ch['number']}: {ch['title']}</b>\n"
-        f"⚡ ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
+        f"⚡ ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
     )
     
     if not raw_sum:
@@ -756,12 +756,14 @@ def handle_callback(cb):
         if row_sub:
             nav_buttons.append(row_sub)
             
-        # Nota Kaki & Ringkasan
+        # Nota Kaki, Intipati Sub-Tajuk & Ringkasan Bab
         ch = CHAPTERS[ch_idx]
-        row_extra = []
+        row_extra = [
+            {"text": "⚡ Intipati Sub-Tajuk", "callback_data": f"sumsub_{ch_idx}_{s_idx}"},
+            {"text": "⚡ Ringkasan Bab", "callback_data": f"sumch_{ch_idx}"}
+        ]
         if ch.get("footnotes"):
-            row_extra.append({"text": f"📝 Nota Kaki ({len(ch['footnotes'])})", "callback_data": f"fn_{ch_idx}_{s_idx}_{page}"})
-        row_extra.append({"text": "⚡ Ringkasan Bab", "callback_data": f"sumch_{ch_idx}"})
+            row_extra.insert(0, {"text": f"📝 Nota Kaki ({len(ch['footnotes'])})", "callback_data": f"fn_{ch_idx}_{s_idx}_{page}"})
         nav_buttons.append(row_extra)
         
         nav_buttons.append([
@@ -770,6 +772,57 @@ def handle_callback(cb):
         ])
         
         edit_message(chat_id, msg_id, text_out, {"inline_keyboard": nav_buttons})
+        return
+
+    # Paparan Intipati Ringkasan Sub-Tajuk
+    if data.startswith("sumsub_"):
+        parts = data.split("_")
+        ch_idx = int(parts[1])
+        s_idx = int(parts[2])
+        
+        ch = CHAPTERS[ch_idx]
+        sections = get_chapter_sections(ch_idx)
+        sec = sections[s_idx] if s_idx < len(sections) else {"title": "Sub-Tajuk"}
+        
+        # Cari ringkasan subtopic daripada ch.get("subtopics_data")
+        sub_data = ch.get("subtopics_data", [])
+        sum_content = None
+        
+        if s_idx < len(sub_data):
+            sum_content = sub_data[s_idx].get("summary")
+            
+        if not sum_content and len(sub_data) > 0:
+            import re
+            sec_clean = re.sub(r"^\d+\.\s*", "", sec["title"]).strip().lower()
+            for sd in sub_data:
+                sd_title = sd.get("title", "").lower()
+                if sec_clean in sd_title or sd_title in sec_clean:
+                    sum_content = sd.get("summary")
+                    break
+                    
+        if not sum_content:
+            sum_content = "* **Intipati & Pemahaman:**\n  Intipati ringkasan bagi sub-tajuk ini sedang dimantapkan."
+            
+        header = (
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n"
+            f"🌿 <b>AL-MUNTALAQ: INTIPATI SUB-TAJUK</b>\n"
+            f"📚 <b>{ch['number']}: {ch['title']}</b>\n"
+            f"📑 <b>Sub-Tajuk: {sec['title']}</b>\n"
+            f"🟢 ━━━━━━━━━━━━━━━━━━━ 🪙\n\n"
+        )
+        
+        body = md_to_telegram_html(sum_content)
+        msg_out = header + f"<blockquote>{body}</blockquote>"
+        
+        nav_buttons = [
+            [{"text": "📖 Baca Teks Penuh Sub-Tajuk Ini", "callback_data": f"sub_{ch_idx}_{s_idx}_0"}],
+            [{"text": "⚡ Ringkasan Penuh Bab", "callback_data": f"sumch_{ch_idx}"}],
+            [
+                {"text": "📑 Senarai Sub-Tajuk", "callback_data": f"ch_{ch_idx}"},
+                {"text": "🏠 Utama", "callback_data": "menu_main"}
+            ]
+        ]
+        edit_message(chat_id, msg_id, msg_out, {"inline_keyboard": nav_buttons})
         return
 
     # Paparan Nota Kaki Bab
