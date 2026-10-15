@@ -260,7 +260,7 @@ def get_subtopics_keyboard(ch_idx):
     buttons.append([{"text": "⚡ Baca Ringkasan Padat Bab Ini", "callback_data": f"sumch_{ch_idx}"}])
     
     for s_idx, sec in enumerate(sections):
-        title_btn = f"🌿 {s_idx+1}. {sec['title']}"
+        title_btn = f"🌱 {s_idx+1}. {sec['title']}"
         if len(title_btn) > 36:
             title_btn = title_btn[:34] + ".."
         buttons.append([{"text": title_btn, "callback_data": f"sub_{ch_idx}_{s_idx}_0"}])
