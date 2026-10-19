@@ -302,7 +302,7 @@ def format_subtopic_text(ch_idx, s_idx, page=0, user_search_query=None):
         elif ptype == "quote":
             rendered_paras.append(f"<blockquote>❝ <i>{ptext}</i> ❞</blockquote>")
         else:
-            if user_search_query and user_search_query.lower() in ptext.lower():
+            if user_search_query and normalize_kw(user_search_query) in normalize_kw(ptext):
                 pattern = re.compile(re.escape(user_search_query), re.IGNORECASE)
                 ptext = pattern.sub(lambda m: f"<b><u>{m.group(0)}</u></b>", ptext)
             rendered_paras.append(ptext)
@@ -353,7 +353,7 @@ def format_summary_text(ch_idx, page=0, user_search_query=None):
     
     for p in paras:
         p_clean = md_to_telegram_html(p.strip())
-        if user_search_query and user_search_query.lower() in p_clean.lower():
+        if user_search_query and normalize_kw(user_search_query) in normalize_kw(p_clean):
             pattern = re.compile(re.escape(user_search_query), re.IGNORECASE)
             p_clean = pattern.sub(lambda m: f"<b><u>{m.group(0)}</u></b>", p_clean)
         cur_page.append(p_clean)
@@ -375,15 +375,21 @@ def format_summary_text(ch_idx, page=0, user_search_query=None):
 
 # ================= CARIAN PINTAR =================
 
+def normalize_kw(text):
+    if not text:
+        return ""
+    return re.sub(r"[\u2018\u2019\u02bb\u02bc`]", "'", str(text).lower())
+
 def search_almuntalaq(keyword):
     kw = keyword.strip().lower()
-    if len(kw) < 2:
+    norm_kw = normalize_kw(keyword.strip())
+    if len(norm_kw) < 2:
         return []
         
     results = []
     for ch_idx, ch in enumerate(CHAPTERS):
         # Cari dalam tajuk bab
-        if kw in ch['title'].lower():
+        if norm_kw in normalize_kw(ch['title']):
             results.append({
                 "type": "bab",
                 "ch_idx": ch_idx,
@@ -394,7 +400,7 @@ def search_almuntalaq(keyword):
         # Cari dalam sub-tajuk & perenggan
         sections = get_chapter_sections(ch_idx)
         for s_idx, sec in enumerate(sections):
-            if kw in sec['title'].lower():
+            if norm_kw in normalize_kw(sec['title']):
                 results.append({
                     "type": "subtopic",
                     "ch_idx": ch_idx,
@@ -407,7 +413,7 @@ def search_almuntalaq(keyword):
             # Cari dalam perenggan
             for p in sec.get("paras", []):
                 ptext = clean_footnote_tags(p.get("text", ""))
-                if kw in ptext.lower():
+                if norm_kw in normalize_kw(ptext):
                     # Ambil snippet sekeliling perkataan
                     idx_kw = ptext.lower().find(kw)
                     start = max(0, idx_kw - 40)
@@ -424,7 +430,7 @@ def search_almuntalaq(keyword):
                     
         # Cari dalam ringkasan
         raw_sum = clean_footnote_tags(ch.get("summary", ""))
-        if kw in raw_sum.lower():
+        if norm_kw in normalize_kw(raw_sum):
             idx_kw = raw_sum.lower().find(kw)
             start = max(0, idx_kw - 40)
             end = min(len(raw_sum), idx_kw + 100)
