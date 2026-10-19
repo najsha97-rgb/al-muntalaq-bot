@@ -216,8 +216,10 @@ def get_main_menu_keyboard():
                 {"text": "⚡ Ringkasan Eksklusif", "callback_data": "menu_summaries"}
             ],
             [
-                {"text": "🔍 Carian Topik & Dalil", "callback_data": "menu_search_info"},
-                {"text": "💎 Mutiara Hikmah Dakwah", "callback_data": "hikmah_random"}
+                {"text": "🔍 Carian Topik & Dalil", "callback_data": "menu_search_info"}
+            ],
+            [
+                {"text": "💎 174 Mutiara Kata (Hadis Nabi SAW + Tokoh & Pejuang)", "callback_data": "hikmah_random"}
             ],
             [
                 {"text": "🌿 Buka Web PWA Al-Muntalaq 🌐", "url": "https://najsha97-rgb.github.io/al-muntalaq-pwa/"}
