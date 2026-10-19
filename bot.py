@@ -567,7 +567,7 @@ def handle_message(msg):
         query = text[5:].strip()
         USER_SEARCH[chat_id] = query
         if not query:
-            send_message(chat_id, "ℹ️ <i>Sila masukkan kata carian. Contoh:</i>\n<code>/cari hawa nafsu</code>\n<code>/cari amal jamaie</code>\n<code>/cari gerhana</code>")
+            send_message(chat_id, "ℹ️ <i>Sila masukkan kata carian. Contoh:</i>\n<code>/cari hawa nafsu</code>\n<code>/cari amal jama'i</code>\n<code>/cari gerhana</code>")
             return
             
         results = search_almuntalaq(query)
@@ -689,7 +689,7 @@ def handle_callback(cb):
             f"Anda boleh membuat carian pantas terus dalam ruangan sembang ini dengan menaip:\n\n"
             f"👉 <code>/cari hawa nafsu</code>\n"
             f"👉 <code>/cari gerhana</code>\n"
-            f"👉 <code>/cari amal jamaie</code>\n"
+            f"👉 <code>/cari amal jama'i</code>\n"
             f"👉 <code>/cari tanzim</code>\n"
             f"👉 <code>/cari banna</code>\n\n"
             f"Bot akan mencari secara menyeluruh merangkumi tajuk bab, sub-tajuk, ayat quran dan ringkasan."

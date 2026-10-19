@@ -13,7 +13,7 @@ Bot Telegram ini dibina khas untuk membolehkan para pembaca, aktivis dan pendakw
    - **Lapisan 1 (Teks Lengkap):** Terjemahan penuh berserta paparan teks ayat Al-Quran, matan hadith, kata-kata salaf dan 246 nota kaki.
    - **Lapisan 2 (Ringkasan Eksklusif):** Ringkasan berstruktur bagi setiap bab berserta **💎 Mutiara Kata-kata Tokoh & Salafussoleh (Nukilan Emas)** dan **⚔️ Fiqh Amal Haraki & Dimensi Tarbawi**.
 3. **Carian Pintar (`/cari`):**
-   - Taip `/cari hawa nafsu`, `/cari gerhana`, `/cari amal jamaie`, `/cari tanzim`, `/cari banna` untuk mendapatkan topik berkaitan secara serta-merta.
+   - Taip `/cari hawa nafsu`, `/cari gerhana`, `/cari amal jama'i`, `/cari tanzim`, `/cari banna` untuk mendapatkan topik berkaitan secara serta-merta.
 4. **Mutiara Hikmah Dakwah (`/hikmah`):**
    - Memaparkan mutiara kata para sahabat, salafussoleh dan tokoh harakah secara rawak untuk tazkirah harian.
 5. **Pautan Terus ke Web PWA:**
