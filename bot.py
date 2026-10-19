@@ -579,13 +579,14 @@ def handle_message(msg):
         msg_out = f"🔍 <b>Hasil Carian untuk: \"{md_to_telegram_html(query)}\"</b>\n<i>Ditemui {len(results)} topik berkaitan:</i>\n\n"
         
         for idx, r in enumerate(results[:8]):
-            msg_out += f"<b>{idx+1}. {r['title']}</b>\n<i>{md_to_telegram_html(r['snippet'])}</i>\n\n"
+            badge = "📖 [Versi Penuh]" if r.get("type") != "summary" else "📑 [Ringkasan]"
+            msg_out += f"<b>{idx+1}. {badge} {r['title']}</b>\n<i>{md_to_telegram_html(r['snippet'])}</i>\n\n"
             if r['type'] == "subtopic":
-                buttons.append([{"text": f"📖 Baca: {r['title'][:30]}", "callback_data": f"sub_{r['ch_idx']}_{r['s_idx']}_0"}])
+                buttons.append([{"text": f"📖 [Versi Penuh] {r['title'][:26]}", "callback_data": f"sub_{r['ch_idx']}_{r['s_idx']}_0"}])
             elif r['type'] == "summary":
-                buttons.append([{"text": f"⚡ Buka Ringkasan {r['title'][:25]}", "callback_data": f"sumch_{r['ch_idx']}"}])
+                buttons.append([{"text": f"📑 [Ringkasan] {r['title'][:26]}", "callback_data": f"sumch_{r['ch_idx']}"}])
             else:
-                buttons.append([{"text": f"📖 Buka: {r['title'][:30]}", "callback_data": f"ch_{r['ch_idx']}"}])
+                buttons.append([{"text": f"📖 [Versi Penuh] {r['title'][:26]}", "callback_data": f"ch_{r['ch_idx']}"}])
                 
         buttons.append([{"text": "🏠 Menu Utama", "callback_data": "menu_main"}])
         send_message(chat_id, msg_out, {"inline_keyboard": buttons})
@@ -604,11 +605,12 @@ def handle_message(msg):
             buttons = []
             msg_out = f"🔍 <b>Hasil Carian: \"{md_to_telegram_html(text)}\"</b>\n\n"
             for idx, r in enumerate(results[:6]):
-                msg_out += f"<b>{idx+1}. {r['title']}</b>\n<i>{md_to_telegram_html(r['snippet'])}</i>\n\n"
+                badge = "📖 [Versi Penuh]" if r.get("type") != "summary" else "📑 [Ringkasan]"
+                msg_out += f"<b>{idx+1}. {badge} {r['title']}</b>\n<i>{md_to_telegram_html(r['snippet'])}</i>\n\n"
                 if r['type'] == "subtopic":
-                    buttons.append([{"text": f"📖 {r['title'][:32]}", "callback_data": f"sub_{r['ch_idx']}_{r['s_idx']}_0"}])
+                    buttons.append([{"text": f"📖 [Versi Penuh] {r['title'][:26]}", "callback_data": f"sub_{r['ch_idx']}_{r['s_idx']}_0"}])
                 else:
-                    buttons.append([{"text": f"⚡ {r['title'][:32]}", "callback_data": f"sumch_{r['ch_idx']}"}])
+                    buttons.append([{"text": f"📑 [Ringkasan] {r['title'][:26]}", "callback_data": f"sumch_{r['ch_idx']}"}])
             buttons.append([{"text": "🏠 Menu Utama", "callback_data": "menu_main"}])
             send_message(chat_id, msg_out, {"inline_keyboard": buttons})
             return
