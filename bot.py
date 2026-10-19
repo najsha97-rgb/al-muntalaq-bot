@@ -626,6 +626,27 @@ def handle_callback(cb):
     
     answer_callback_query(cb_id)
     
+    if data == "reopen_search":
+        q = USER_SEARCH.get(chat_id)
+        if q:
+            results = search_almuntalaq(q)
+            if results:
+                buttons = []
+                msg_out = f"🔍 <b>Hasil Carian untuk: \"{md_to_telegram_html(q)}\"</b>\n<i>Ditemui {len(results)} topik berkaitan:</i>\n\n"
+                for idx, r in enumerate(results[:8]):
+                    msg_out += f"<b>{idx+1}. {r['title']}</b>\n<i>{md_to_telegram_html(r['snippet'])}</i>\n\n"
+                    if r['type'] == "subtopic":
+                        buttons.append([{"text": f"📖 Baca: {r['title'][:30]}", "callback_data": f"sub_{r['ch_idx']}_{r['s_idx']}_0"}])
+                    elif r['type'] == "summary":
+                        buttons.append([{"text": f"📑 Buka Ringkasan {r['title'][:25]}", "callback_data": f"sumch_{r['ch_idx']}"}])
+                    else:
+                        buttons.append([{"text": f"📖 Buka: {r['title'][:30]}", "callback_data": f"ch_{r['ch_idx']}"}])
+                buttons.append([{"text": "🏠 Menu Utama", "callback_data": "menu_main"}])
+                edit_message(chat_id, msg_id, msg_out, {"inline_keyboard": buttons})
+                return
+        send_message(chat_id, "Sila buat carian baru dengan /cari [kata kunci].")
+        return
+
     if data == "menu_main":
         USER_SEARCH.pop(chat_id, None)
         welcome_text = (
@@ -771,6 +792,9 @@ def handle_callback(cb):
         if row_sub:
             nav_buttons.append(row_sub)
             
+        if user_search_query:
+            nav_buttons.append([{"text": f"📋 Senarai Hasil Carian: \"{user_search_query[:14]}\"", "callback_data": "reopen_search"}])
+
         # Nota Kaki, Intipati Sub-Tajuk & Ringkasan Bab
         ch = CHAPTERS[ch_idx]
         row_extra = [
