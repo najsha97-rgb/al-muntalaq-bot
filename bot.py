@@ -84,6 +84,7 @@ API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # Penyimpanan Sesi Pengguna Sementara
 USER_STATE = {} # { chat_id: { 'layer': 'layer1' } }
+USER_SEARCH = {} # { chat_id: 'kata_carian' }
 
 def get_user_layer(chat_id):
     if chat_id not in USER_STATE:
@@ -271,7 +272,7 @@ def get_subtopics_keyboard(ch_idx):
     ])
     return {"inline_keyboard": buttons}
 
-def format_subtopic_text(ch_idx, s_idx, page=0):
+def format_subtopic_text(ch_idx, s_idx, page=0, user_search_query=None):
     ch = CHAPTERS[ch_idx]
     sections = get_chapter_sections(ch_idx)
     if s_idx >= len(sections):
@@ -301,6 +302,9 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
         elif ptype == "quote":
             rendered_paras.append(f"<blockquote>❝ <i>{ptext}</i> ❞</blockquote>")
         else:
+            if user_search_query and user_search_query.lower() in ptext.lower():
+                pattern = re.compile(re.escape(user_search_query), re.IGNORECASE)
+                ptext = pattern.sub(lambda m: f"<b><u>{m.group(0)}</u></b>", ptext)
             rendered_paras.append(ptext)
             
     # Himpun mengikut had saiz skrin (~1400 aksara)
@@ -324,9 +328,10 @@ def format_subtopic_text(ch_idx, s_idx, page=0):
     body = pages_content[page] if pages_content else "<i>Tiada teks.</i>"
     
     page_footer = f"\n\n🟢 ━━━━━━━━━━━━━━━━━━━ 🏵️\n📄 <i>Halaman {page+1} daripada {total_pages}</i>"
-    return header + body + page_footer, total_pages
+    highlight_note = f"🔍 <i>[Carian Kata Kunci: \"{user_search_query}\"]</i>\n\n" if user_search_query else ""
+    return header + highlight_note + body + page_footer, total_pages
 
-def format_summary_text(ch_idx, page=0):
+def format_summary_text(ch_idx, page=0, user_search_query=None):
     ch = CHAPTERS[ch_idx]
     raw_sum = ch.get("summary", "")
     
@@ -348,6 +353,9 @@ def format_summary_text(ch_idx, page=0):
     
     for p in paras:
         p_clean = md_to_telegram_html(p.strip())
+        if user_search_query and user_search_query.lower() in p_clean.lower():
+            pattern = re.compile(re.escape(user_search_query), re.IGNORECASE)
+            p_clean = pattern.sub(lambda m: f"<b><u>{m.group(0)}</u></b>", p_clean)
         cur_page.append(p_clean)
         cur_len += len(p_clean)
         if cur_len > 2200:
@@ -362,7 +370,8 @@ def format_summary_text(ch_idx, page=0):
     page = max(0, min(page, total_pages - 1))
     body = pages[page]
     page_footer = f"\n\n───────────────\n📄 <i>Bahagian {page+1} daripada {total_pages}</i>" if total_pages > 1 else ""
-    return header + body + page_footer, total_pages
+    highlight_note = f"🔍 <i>[Carian Kata Kunci: \"{user_search_query}\"]</i>\n\n" if user_search_query else ""
+    return header + highlight_note + body + page_footer, total_pages
 
 # ================= CARIAN PINTAR =================
 
@@ -504,6 +513,7 @@ def handle_message(msg):
         return
         
     if text.startswith("/start") or text.startswith("/menu"):
+        USER_SEARCH.pop(chat_id, None)
         welcome_text = (
             f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n"
             f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b> 🌿\n"
@@ -555,6 +565,7 @@ def handle_message(msg):
 
     if text.startswith("/cari"):
         query = text[5:].strip()
+        USER_SEARCH[chat_id] = query
         if not query:
             send_message(chat_id, "ℹ️ <i>Sila masukkan kata carian. Contoh:</i>\n<code>/cari hawa nafsu</code>\n<code>/cari amal jamaie</code>\n<code>/cari gerhana</code>")
             return
@@ -589,6 +600,7 @@ def handle_message(msg):
     if len(text) >= 3 and not text.startswith("/"):
         results = search_almuntalaq(text)
         if results:
+            USER_SEARCH[chat_id] = text
             buttons = []
             msg_out = f"🔍 <b>Hasil Carian: \"{md_to_telegram_html(text)}\"</b>\n\n"
             for idx, r in enumerate(results[:6]):
@@ -615,6 +627,7 @@ def handle_callback(cb):
     answer_callback_query(cb_id)
     
     if data == "menu_main":
+        USER_SEARCH.pop(chat_id, None)
         welcome_text = (
             f"🟢 ━━━━━━━━━━━━━━━━━━━ 🏵️\n"
             f"🌿 <b>AL-MUNTALAQ (الْمُنْطَلَق)</b> 🌿\n"
@@ -706,7 +719,8 @@ def handle_callback(cb):
         ch_idx = int(parts[1])
         page = int(parts[2]) if len(parts) > 2 else 0
         
-        sum_text, total_pages = format_summary_text(ch_idx, page)
+        user_search_query = USER_SEARCH.get(chat_id)
+        sum_text, total_pages = format_summary_text(ch_idx, page, user_search_query=user_search_query)
         
         nav_buttons = []
         if total_pages > 1:
@@ -734,7 +748,8 @@ def handle_callback(cb):
         s_idx = int(parts[2])
         page = int(parts[3]) if len(parts) > 3 else 0
         
-        text_out, total_pages = format_subtopic_text(ch_idx, s_idx, page)
+        user_search_query = USER_SEARCH.get(chat_id)
+        text_out, total_pages = format_subtopic_text(ch_idx, s_idx, page, user_search_query=user_search_query)
         sections = get_chapter_sections(ch_idx)
         
         nav_buttons = []
