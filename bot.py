@@ -130,6 +130,16 @@ def clean_footnote_tags(text):
     text = re.sub(r'</?sup[^>]*>', '', text, flags=re.IGNORECASE)
     return text
 
+def format_smart_italic(match):
+    inner = match.group(1)
+    # Kira huruf Arab
+    ar_count = len(re.findall(r'[\u0600-\u06FF]', inner))
+    latin_count = len(re.findall(r'[a-zA-Z]', inner))
+    # Jika teks adalah bahasa Arab atau dominan Arab, JANGAN italic-kan (kekal tegak)
+    if ar_count > 0 and ar_count >= latin_count:
+        return inner
+    return f"<i>{inner}</i>"
+
 def md_to_telegram_html(text):
     if not text:
         return ""
@@ -137,8 +147,9 @@ def md_to_telegram_html(text):
     text = clean_footnote_tags(text)
     text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text, flags=re.DOTALL)
-    text = re.sub(r'(?<!\*)\*([^\*\n]+?)\*(?!\*)', r'<i>\1</i>', text)
-    text = re.sub(r'(?<!_)_([^_\n]+?)_(?!_)', r'<i>\1</i>', text)
+    # Format Italic *teks* atau _teks_ -> <i>teks</i> (Hanya teks Rumi/terjemahan, teks Arab tidak di-italic-kan)
+    text = re.sub(r'(?<!\*)\*([^\*\n]+?)\*(?!\*)', format_smart_italic, text)
+    text = re.sub(r'(?<!_)_([^_\n]+?)_(?!_)', format_smart_italic, text)
     text = re.sub(r'^[ \t]*[\*\-][ \t]+', '• ', text, flags=re.MULTILINE)
     return text
 
@@ -306,9 +317,12 @@ def format_subtopic_text(ch_idx, s_idx, page=0, user_search_query=None):
         ptext = md_to_telegram_html(p.get("text", ""))
         if ptype == "quran":
             src = f" <i>({md_to_telegram_html(p.get('source',''))})</i>" if p.get('source') else ""
-            rendered_paras.append(f"<blockquote>📖 <b>[Ayat Al-Quran]</b>\n<i>« {ptext} »</i>{src}</blockquote>")
+            rendered_paras.append(f"<blockquote>📖 <b>[Ayat Al-Quran]</b>\n« {ptext} »{src}</blockquote>")
+        elif ptype == "arabic":
+            src = f" <i>({md_to_telegram_html(p.get('source',''))})</i>" if p.get('source') else ""
+            rendered_paras.append(f"<blockquote>{ptext}{src}</blockquote>")
         elif ptype == "quote":
-            rendered_paras.append(f"<blockquote>❝ <i>{ptext}</i> ❞</blockquote>")
+            rendered_paras.append(f"<blockquote>❝ {ptext} ❞</blockquote>")
         else:
             if user_search_query and normalize_kw(user_search_query) in normalize_kw(ptext):
                 pattern = re.compile(re.escape(user_search_query), re.IGNORECASE)
@@ -466,7 +480,7 @@ def get_random_hikmah_message_and_keyboard():
             f"💎 <b>MUTIARA HIKMAH DAKWAH</b> ⚜️\n"
             f"🟢 ━━━━━━━━━━━━━━━━━━━ ⚜️\n\n"
             f"👤 <b>{item.get('speaker', 'Tokoh Dakwah')}</b>\n\n"
-            f"<blockquote><i>{quote_text}</i></blockquote>\n\n"
+            f"<blockquote>{quote_text}</blockquote>\n\n"
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"📚 <b>Sumber:</b> {item.get('ch_num', '')} - {item.get('ch_title', '')}\n"
             f"🌿 <i>Kitab Al-Muntalaq — Syeikh Muhammad Ahmad Ar-Rasyid</i>\n"
