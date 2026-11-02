@@ -154,6 +154,20 @@ def md_to_telegram_html(text):
     return text
 
 
+def send_document(chat_id, file_path, caption="", reply_markup=None):
+    url = f"{API_BASE}/sendDocument"
+    try:
+        with open(file_path, "rb") as f:
+            files = {"document": f}
+            data = {"chat_id": chat_id, "caption": caption, "parse_mode": "HTML"}
+            if reply_markup:
+                data["reply_markup"] = json.dumps(reply_markup)
+            res = session.post(url, data=data, files=files, timeout=60)
+            return res.json()
+    except Exception as e:
+        print(f"Ralat sendDocument: {e}")
+        return None
+
 def send_message(chat_id, text, reply_markup=None, parse_mode="HTML"):
     payload = {
         "chat_id": chat_id,
@@ -225,6 +239,38 @@ def get_chapter_sections(ch_idx):
 
 # ================= MENU GENERATORS =================
 
+def get_pbi_main_keyboard():
+    return {
+        "inline_keyboard": [
+            [
+                {"text": "⚖️ 1. Tolak Hawa Nafsu (Bab 1)", "callback_data": "pbi_muntalaq_1"}
+            ],
+            [
+                {"text": "🌅 2. Fiqh Ibtila' & Kemenangan (Bab 2)", "callback_data": "pbi_muntalaq_2"}
+            ],
+            [
+                {"text": "👥 3. Soleh Kepada Muslih Haraki (Bab 3)", "callback_data": "pbi_muntalaq_3"}
+            ],
+            [
+                {"text": "📢 4. Fardhu Dakwah Penjamin Watan (Bab 4)", "callback_data": "pbi_muntalaq_4"}
+            ],
+            [
+                {"text": "🛡️ 5. Tolak Sikap Bermain-main (Bab 5)", "callback_data": "pbi_muntalaq_5"}
+            ],
+            [
+                {"text": "🏛️ Pemetaan 8 Tonggak Kuasa", "callback_data": "pbi_muntalaq_tonggak"},
+                {"text": "📚 Harmonisasi 4 Tetralogi", "callback_data": "pbi_muntalaq_tetralogi"}
+            ],
+            [
+                {"text": "📕 Dokumen Am PDF (886 KB)", "callback_data": "pbi_doc_pdf"},
+                {"text": "📕 Dokumen Khas PDF (4.3 MB)", "callback_data": "pbi_khas_muntalaq_pdf"}
+            ],
+            [
+                {"text": "⬅️ Kembali ke Menu Utama", "callback_data": "menu_main"}
+            ]
+        ]
+    }
+
 def get_main_menu_keyboard():
     return {
         "inline_keyboard": [
@@ -237,6 +283,9 @@ def get_main_menu_keyboard():
             ],
             [
                 {"text": "💎 174 Mutiara Kata (Hadis Nabi SAW + Tokoh & Pejuang)", "callback_data": "hikmah_random"}
+            ],
+            [
+                {"text": "🌍 Ummah Fadhilah & PBI (Sumbangan al-Muntalaq)", "callback_data": "menu_pbi_muntalaq"}
             ],
             [
                 {"text": "🌿 Buka Web PWA Al-Muntalaq 🌐", "url": "https://najsha97-rgb.github.io/al-muntalaq-pwa/"}
@@ -729,6 +778,177 @@ def handle_callback(cb):
     if data == "hikmah_random":
         h_text, btns = get_random_hikmah_message_and_keyboard()
         edit_message(chat_id, msg_id, h_text, btns)
+        return
+
+    if data == "menu_pbi_muntalaq":
+        txt = (
+            "🌍 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>UMMAH FADHILAH & PERADABAN BARU ISLAM (PBI)</b>\n"
+            "<i>Sumbangan Kitab Al-Muntalaq dalam Membina Kuasa Nasional 100 Tahun Kedua</i>\n"
+            "🌍 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "<blockquote>🧭 <b>Titik Mula Fikrah &amp; Keaslian Syariat:</b>\n"
+            "Kitab <b>Al-Muntalaq</b> (Titik Tolak) menjawab persoalan mutlak: <i>'Dari mana dan atas asas apa kita bermula?'</i> "
+            "Ia memastikan kebangkitan Ummah Fadhilah tidak meniru acuan ideologi Barat, sebaliknya berpaut pada ketulenan wahyu "
+            "dan keaslian syariat (al-aṣālah) serta penyerahan mutlak (at-taslīm) kepada Allah SWT.</blockquote>\n\n"
+            "📌 <b>Lima Teras Sumbangan Al-Muntalaq:</b>\n"
+            "1. ⚖️ <b>Tolak Hawa Nafsu:</b> Asas akidah &amp; kenegaraan (Bab 1)\n"
+            "2. 🌅 <b>Fiqh Ibtila':</b> Gerhana bukan terbenamnya matahari (Bab 2)\n"
+            "3. 👥 <b>Muslih Haraki:</b> Kebaikan tersusun menewaskan kebatilan (Bab 3)\n"
+            "4. 📢 <b>Fardhu Dakwah:</b> Penjamin keselamatan watan (Bab 4)\n"
+            "5. 🛡️ <b>Keseriusan Jihad:</b> Tolak sikap bermain-main (Bab 5)\n\n"
+            "<i>Sila pilih butang di bawah untuk membaca huraian lanjut atau memuat turun dokumen:</i>"
+        )
+        edit_message(chat_id, msg_id, txt, get_pbi_main_keyboard())
+        return
+
+    if data == "pbi_muntalaq_1":
+        txt = (
+            "⚖️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>1. MENOLAK HAWA NAFSU SEBAGAI ASAS KENEGARAAN (BAB 1)</b>\n"
+            "<i>Prinsip Penyerahan Mutlak (At-Tajarrod wa al-Taslīm)</i>\n"
+            "⚖️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Penolakan Hawa Nafsu Moden:</b> Falsafah Barat menobatkan kebebasan hawa nafsu sebagai penentu undang-undang. Al-Muntalaq menegaskan kebangkitan Ummah Fadhilah wajib bermula dengan menolak hawa nafsu secara mutlak (<i>Naḥnu Narfuḍu al-Hawā</i>).\n\n"
+            "• <b>Tonggak 1 Kuasa Nasional:</b> Kedaulatan negara wajib bersandarkan tauhid dan syariat Allah, bukan suara majoriti yang menghalalkan perkara mungkar."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_2":
+        txt = (
+            "🌅 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>2. FIQH IBTILA' &amp; KEYAKINAN KEMENANGAN (BAB 2)</b>\n"
+            "<i>Gerhana Bukan Terbenamnya Matahari</i>\n"
+            "🌅 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Sunnatullah Perjuangan:</b> Tekanan musuh, fitnah geopolitik, dan kejatuhan sistem 1924 hanyalah gerhana sementara, bukannya kematian peradaban Islam.\n\n"
+            "• <b>Optimisme Rabbani:</b> Menolak keputusasaan (<i>al-ya's</i>) dan menyuburkan keyakinan teguh kepada janji pertolongan Allah (<i>al-thiqah billāh</i>)."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_3":
+        txt = (
+            "👥 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>3. SOLEH KEPADA MUSLIH HARAKI (BAB 3)</b>\n"
+            "<i>Orang-Orang Baik yang Binasa</i>\n"
+            "👥 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Hukum Sosiologi Al-Quran:</b> Kebaikan individu yang berselerak pasti ditewaskan oleh kebatilan yang tersusun rapi.\n\n"
+            "• <b>Tonggak 5 (Kesatuan Ummah):</b> Menolak kesolehan pasif. Ummah Fadhilah menuntut transformasi da'i menjadi 'muslih' yang berdisiplin di dalam satu saf tanzim yang kukuh laksana <i>bunyān marṣūṣ</i>."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_4":
+        txt = (
+            "📢 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>4. FARDHU DAKWAH PENJAMIN KESELAMATAN WATAN (BAB 4)</b>\n"
+            "<i>Benteng Moral Menghalang Bencana Sosiologi</i>\n"
+            "📢 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Amar Makruf Nahi Mungkar:</b> Dakwah adalah fardhu syarak penjamin kedaulatan dan keamanan sesebuah watan.\n\n"
+            "• <b>Tonggak 8 (Integriti Sosial):</b> Apabila budaya berpesan-pesan dengan kebenaran terhenti, kerosakan akhlak akan merebak dan memusnahkan ketahanan nasional."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_5":
+        txt = (
+            "🛡️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>5. MENOLAK SIKAP BERMAIN-MAIN (BAB 5)</b>\n"
+            "<i>Ahli Ibadah yang Bermain-main</i>\n"
+            "🛡️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Keseriusan Perjuangan:</b> Amaran keras terhadap sikap mengambil mudah urusan agama, membazir waktu lapang, atau memperalatkan dakwah demi kepentingan peribadi.\n\n"
+            "• <b>Etos Pejuang:</b> Membina generasi pelopor yang memandang tanggungjawab memimpin peradaban sebagai amanah yang menuntut pengorbanan tertinggi."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_tonggak":
+        txt = (
+            "🏛️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>PEMETAAN 8 TONGGAK KUASA NASIONAL</b>\n"
+            "<i>Sumbangan Kitab Al-Muntalaq</i>\n"
+            "🏛️ ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>Tonggak 1 (Tasawur &amp; Akidah):</b> Membebaskan akidah daripada hawa nafsu liberal; berpaut pada ketulenan wahyu.\n"
+            "• <b>Tonggak 5 (Kesatuan Ummah):</b> Menggembleng individu soleh menjadi saf muslih yang tersusun rapi.\n"
+            "• <b>Tonggak 8 (Integriti Sosial &amp; Akhlak):</b> Fardhu dakwah yang memelihara kesucian moral masyarakat watan."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_muntalaq_tetralogi":
+        txt = (
+            "📚 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n"
+            "<b>HARMONISASI 4 KARYA TETRALOGI AL-RASYID</b>\n"
+            "<i>Gagasan Menuju 100 Tahun Kedua</i>\n"
+            "📚 ━━━━━━━━━━━━━━━━━━━━━ ⚡\n\n"
+            "• <b>1. Al-Muntalaq:</b> Titik mula kesedaran, memurnikan tauhid, membentuk minda dakwah komprehensif.\n"
+            "• <b>2. Al-‘Awā’iq:</b> Radar pengesan ranjau nafsu, halangan keperibadian, dan penyakit fitnah.\n"
+            "• <b>3. Al-Raqā'iq:</b> Menyiram roh pejuang dengan tazkiyah demi mengelakkan ghuluw siasah.\n"
+            "• <b>4. Al-Masār:</b> Seni bina perancangan, polisi pentadbiran, dan strategi peradaban watan."
+        )
+        kb = {"inline_keyboard": [[{"text": "⬅️ Kembali ke Menu PBI", "callback_data": "menu_pbi_muntalaq"}]]}
+        edit_message(chat_id, msg_id, txt, kb)
+        return
+
+    if data == "pbi_doc_docx":
+        doc_path = os.path.join(os.path.dirname(__file__), "Gagasan_Ummah_Fadhilah_Kuasa_Nasional_dan_Tetralogi_Al-Rasyid.docx")
+        if os.path.exists(doc_path):
+            caption = (
+                "📄 <b>DOKUMEN PENGENALAN AM (MICROSOFT WORD)</b>\n\n"
+                "<b>Tajuk:</b> Gagasan Ummah Fadhilah, Kuasa Nasional dan Sumbangan Tetralogi Al-Rasyid\n"
+                "<b>Format:</b> .docx (Boleh disunting &amp; dikaji bersama komuniti/usrah)\n\n"
+                "<i>Kerangka Pemikiran Menuju 100 Tahun Kedua Pasca-1924</i>"
+            )
+            send_document(chat_id, doc_path, caption)
+        else:
+            send_message(chat_id, "⚠️ Fail Word (.docx) Am tidak ditemui.")
+        return
+
+    if data == "pbi_doc_pdf":
+        pdf_path = os.path.join(os.path.dirname(__file__), "Gagasan_Ummah_Fadhilah_Kuasa_Nasional_dan_Tetralogi_Al-Rasyid.pdf")
+        if os.path.exists(pdf_path):
+            caption = (
+                "📕 <b>E-BUKU DOKUMEN PENGENALAN AM (PDF)</b>\n\n"
+                "<b>Tajuk:</b> Gagasan Ummah Fadhilah, Kuasa Nasional dan Sumbangan Tetralogi Al-Rasyid\n"
+                "<b>Format:</b> .pdf (Sedia dicetak &amp; dibaca di mana-mana peranti)\n\n"
+                "<i>Kerangka Pemikiran Menuju 100 Tahun Kedua Pasca-1924</i>"
+            )
+            send_document(chat_id, pdf_path, caption)
+        else:
+            send_message(chat_id, "⚠️ Fail PDF (.pdf) Am tidak ditemui.")
+        return
+
+    if data == "pbi_khas_muntalaq_docx":
+        doc_path = os.path.join(os.path.dirname(__file__), "Sumbangan_Al_Muntalaq_Dalam_Ummah_Fadhilah_Kuasa_Nasional_dan_PBI.docx")
+        if os.path.exists(doc_path):
+            caption = (
+                "📄 <b>DOKUMEN KHAS AL-MUNTALAQ (WORD)</b>\n\n"
+                "<b>Tajuk:</b> Sumbangan Kitab Al-Muntalaq dalam Pembinaan Ummah Fadhilah, Kuasa Nasional &amp; PBI\n"
+                "<b>Format:</b> .docx (Titik Tolak Fikrah &amp; Keaslian Syariat)\n\n"
+                "<i>Siri 1 Fiqh Haraki • As-Syeikh Muhammad Ahmad al-Rasyid</i>"
+            )
+            send_document(chat_id, doc_path, caption)
+        else:
+            send_message(chat_id, "⚠️ Fail Word (.docx) Khas Al-Muntalaq tidak ditemui.")
+        return
+
+    if data == "pbi_khas_muntalaq_pdf":
+        pdf_path = os.path.join(os.path.dirname(__file__), "Sumbangan_Al_Muntalaq_Dalam_Ummah_Fadhilah_Kuasa_Nasional_dan_PBI.pdf")
+        if os.path.exists(pdf_path):
+            caption = (
+                "📕 <b>DOKUMEN KHAS AL-MUNTALAQ (PDF)</b>\n\n"
+                "<b>Tajuk:</b> Sumbangan Kitab Al-Muntalaq dalam Pembinaan Ummah Fadhilah, Kuasa Nasional &amp; PBI\n"
+                "<b>Format:</b> .pdf (E-Buku sedia cetak)\n\n"
+                "<i>Titik Tolak Fikrah &amp; Transformasi Muslih Haraki</i>"
+            )
+            send_document(chat_id, pdf_path, caption)
+        else:
+            send_message(chat_id, "⚠️ Fail PDF (.pdf) Khas Al-Muntalaq tidak ditemui.")
         return
 
     if data == "menu_about":
